@@ -40,15 +40,13 @@ if __name__ == "__main__":
 
 	for x in range(W):
 		for y in range(H):
-			if(p[x,y][0] < thresh and p[x,y][1] < thresh and p[x,y][2] < thresh):
+			if(pix[x,y][0] < thresh and pix[x,y][1] < thresh and pix[x,y][2] < thresh):
 				xtotal += x
 				ytotal += y
 				xcount += 1
-				ytotal += 1
+				ycount += 1
 
 
 	answerx = xtotal/xcount
 	answery = ytotal/ycount
 	print(str(answerx) + " " + str(answery))
-
-	
