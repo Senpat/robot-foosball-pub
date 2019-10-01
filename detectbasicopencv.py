@@ -1,10 +1,11 @@
 import cv2
 
-cap = cv2.VideoCapture("noChessBoardSmall.mov")
+cap = cv2.VideoCapture("C:/Users/zz198/Desktop/Senior Research/Videos/jerrycam1.mp4")
 if not cap:
     print("!!! Failed VideoCapture: invalid parameter!")
 frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+print(frame_width,frame_height)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter('output.avi', fourcc, 30.0, (frame_height, frame_width))
 fr=0
@@ -26,10 +27,10 @@ while (True):
                 x_accum += x
                 y_accum += y
                 ctpix += 1
-                cv2.circle(current_frame,(x,y),2,(0,255,0),1)
+                #cv2.circle(current_frame,(x,y),2,(0,255,0),1)
     print(ctpix)
     cv2.circle(current_frame, (x_accum // ctpix, y_accum // ctpix), 3, (0, 0, 255), 2)
-    out.write(current_frame)
+    #out.write(current_frame)
     cv2.imshow("hi",current_frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

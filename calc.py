@@ -1,13 +1,32 @@
 
 #Constants
 #(0,0) is top left corner, (W,H) is bottom right
-YU = 100
-YD = 260
-LEVERS = {40,80,160,240}
+
+'''
+#phonecam1
+YU = 0
+YD = 680
+LEVERS = [406,730,1061,1230]
+'''
+
+#jerrycam1
+YU = 21
+YD = 439
+LEVERS = [306,504,704,801]
 
 
 
-prev = []
+#prev = [(252,527),(261,515)]
+#prev = [(502,578),(622,508)]
+#prev = [(110,417)]
+#prev = [(532,412),(587,405)]
+
+prev = [(424,236),(479,242)]
+
+
+
+
+
 
 #takes in a point (px,py) which is the latest coordinate of the ball.
 #uses list of past points
@@ -17,19 +36,19 @@ def calc(px,py):
 
 	#prev is empty
 	if(not prev):
-		prev = {(px,py)}
+		prev = [(px,py)]
 		return
 
 	#ball is going forward - check px > x of last point
-	if(px >= prev[-1][0]):
-		prev = {(px,py)}
+	if(px <= prev[-1][0]):
+		prev = [(px,py)]
 		return
 
-	prev.append((px,py))
+
 
 	#list that contains the y coordinate of ball at each of the levers
 	#-1 means ball is in front of lever, so don't move it
-	ret = {-1,-1,-1,-1}
+	ret = [-1,-1,-1,-1]
 
 	#for brevity - (x1,y1) is current point of ball, (x2,y2) is previous point of ball
 	x1=px
@@ -73,6 +92,9 @@ def calc(px,py):
 
 			ret[i] = y
 
+	#print("hi" + ret)
+
+	prev.append((px,py))
 	return ret
 
 
@@ -82,4 +104,5 @@ def calc(px,py):
 
 
 if __name__ == "__main__":
-	pass
+	out = calc(621,248)
+	print(out)
