@@ -1,5 +1,5 @@
 #runs detection code in detectbasicopencv2.py and calculate trajectory with calc.py, and display
-
+#based off of detectandcalc.py, uses linear regression for less erratic trajectory calculation.
 # USAGE
 # python ball_tracking.py --video ball_tracking_example.mp4
 # python ball_tracking.py
@@ -13,29 +13,48 @@ import cv2
 import imutils
 import time
 
-
+ERRORTHRESH = 8
+SLOMO = True
 #jerrycam1
 YU = 21
 YD = 439
 LEVERS = [306,504,704,801]
 
-prev = []
+prevx = np.array([])
+prevy = np.array([])
+
+
+
+def checknewcolumn(px,py):
+	lastx = prevx[-1]
+	for i in LEVERS:
+		if(px>i and lastx<i):
+			return True
+	return False
 
 
 #takes in a point (px,py) which is the latest coordinate of the ball.
-#uses list of past points
+#uses linear regression and restarts calculating when ball crosses a lever (only time it can be deflected)
 #return list that contains the y coordinate of ball at each of the levers
-def calc(px,py):
-	global prev
+def calc2(px,py):
+	global prevx,prevy
 	#print(px,py)
 	#prev is empty
-	if(not prev):
-		prev = [(px,py)]
+	if(len(prevx)==0):
+		prevx = np.array([px])
+		prevy = np.array([py])
 		return
 
 	#ball is going forward - check px > x of last point
-	if(px <= prev[-1][0]):
-		prev = [(px,py)]
+	if(px <= prevx[-1]):
+		prevx = np.array([px])
+		prevy = np.array([py])
+		return
+
+	#in new column, restart checking linear regression
+	if(checknewcolumn(px,py)):
+		prevx = np.array([px])
+		prevy = np.array([py])
 		return
 
 
@@ -44,51 +63,81 @@ def calc(px,py):
 	#-1 means ball is in front of lever, so don't move it
 	ret = [-1,-1,-1,-1]
 
-	#for brevity - (x1,y1) is current point of ball, (x2,y2) is previous point of ball
-	x1=px
-	y1=py
-	x2=prev[-1][0]
-	y2=prev[-1][1]
+	prevx = np.append(prevx,[px])
+	prevy = np.append(prevy,[py])
 
-	#ball is going up
-	if(y1<=y2):
-		#x coordinate when the ball bounces off of YU
-		#-99 means it never intersects YU, so when py == prev[-1][1]
-		intersect = -99
-		if(y1 != y2):
-			intersect = (YU-y1)*(x1-x2)/(y1-y2) + x1				#FORMULA #1: Intersection Formula
+	z,_,_,_,_ = np.polyfit(prevx,prevy,1,full=True)
+	p = np.poly1d(z)
+	print(str(z) + " " + str(len(prevx)))
 
-		for i in range(len(LEVERS)):
-			#find y coordinate when ball crosses LEVERS[i]
+	for i in range(len(LEVERS)):
+		ret[i] = p(LEVERS[i])
+		if(ret[i] < YU):
+			ret[i] += 2*(YU-ret[i])
+		if(ret[i] > YD):
+			ret[i] -= 2*(ret[i]-YD)
 
-			y = (y1-y2)*(LEVERS[i]-x1)/(x1-x2)+y1
-
-			#check if ball will bounce before reaching LEVERS[i]
-			if(y < YU):
-				y += 2*(YU-y)
-
-			ret[i] = y
-
-	#ball is going down
-	else:
-
-
-		intersect = (YD-y1)*(x1-x2)/(y1-y2) + x1
-
-		for i in range(len(LEVERS)):
-			#find y coordinate when ball crosses LEVERS[i]
-
-			y = (y1-y2)*(LEVERS[i]-x1)/(x1-x2)+y1
-
-			#check if ball will bounce before reaching LEVERS[i]
-			if(y > YD):
-				y -= 2*(y-YD)
-
-			ret[i] = y
 
 	#print("hi" + ret)
 
-	prev.append((px,py))
+
+
+	#print(ret)
+	return ret
+
+#takes in a point (px,py) which is the latest coordinate of the ball.
+#uses linear regression and restarts when the regression reaches a certain error
+#return list that contains the y coordinate of ball at each of the levers
+def calc(px,py):
+	global prevx,prevy
+	#print(px,py)
+	#prev is empty
+	if(len(prevx)==0):
+		prevx = np.array([px])
+		prevy = np.array([py])
+		#print("ADD 1")
+		return
+
+	#ball is going forward - check px > x of last point
+	if(px < prevx[-1]):
+		prevx = np.array([px])
+		prevy = np.array([py])
+		#print("BACKWARDS")
+		return
+
+
+	#list that contains the y coordinate of ball at each of the levers
+	#-1 means ball is in front of lever, so don't move it
+	ret = [-1,-1,-1,-1]
+
+	prevx = np.append(prevx,[px])
+	prevy = np.append(prevy,[py])
+
+	z,error,_,_,_ = np.polyfit(prevx,prevy,1,full=True)
+	print(str(error) + " " + str(len(prevx)))
+	#print(prevx)
+	if(len(error) == 1 and error[0] > ERRORTHRESH):
+		prevx = np.array([px])
+		prevy = np.array([py])
+		print("RESET")
+		return
+
+
+	p = np.poly1d(z)
+	#print(str(z) + " " + str(len(prevx)))
+
+	for i in range(len(LEVERS)):
+		ret[i] = p(LEVERS[i])
+		if(ret[i] < YU):
+			ret[i] += 2*(YU-ret[i])
+		if(ret[i] > YD):
+			ret[i] -= 2*(ret[i]-YD)
+
+
+	#print("hi" + ret)
+
+
+
 	#print(ret)
 	return ret
 
@@ -170,8 +219,7 @@ def run(vs):
 						#print(LEVERS[i],intersections[i])
 						cv2.circle(frame,(LEVERS[i],int(intersections[i])),10,(255,0,0),-1)
 
-				#if(intersections and intersections[0] and intersections[-1]):
-				#	cv2.line(frame,(LEVERS[0],int(intersections[0])),(LEVERS[-1],int(intersections[-1])),(255,0,0),thickness=3)
+
 
 
 
@@ -201,7 +249,7 @@ def run(vs):
 			break
 
 		#"slomo"
-		if(len(cnts)>0):
+		if(SLOMO and len(cnts)>0):
 			time.sleep(0.1)
 
 
