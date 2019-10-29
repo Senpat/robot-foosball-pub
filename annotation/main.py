@@ -152,11 +152,14 @@ class LabelTool():
             except ValueError as ve:
                 tkinter.messagebox.showerror("Error!", message = "The folder should be numbers")
                 return
-        if not os.path.isdir('./Images/%s' % self.category):
-           tkinter.messagebox.showerror("Error!", message = "The specified dir doesn't exist!")
-           return
+        '''
+		if not os.path.isdir('./Images%s' % self.category):
+            tkinter.messagebox.showerror("Error!", message = "The specified dir doesn't exist!")
+            return
+        '''
         # get image list
         self.imageDir = os.path.join(r'./Images', '%s' %(self.category))
+        #self.imageDir = op.path.
         self.imageList = glob.glob(os.path.join(self.imageDir, '*.jpg'))
         if len(self.imageList) == 0:
             print('No .jpg images found in the specified dir!')
@@ -168,9 +171,9 @@ class LabelTool():
         self.total = len(self.imageList)
 
          # set up output dir
-        if not os.path.exists('./Labels'):
-            os.mkdir('./Labels')
-        self.outDir = os.path.join(r'./Labels', '%s' %(self.category))
+        if not os.path.exists('./Patrick/Labels'):
+            os.mkdir('./Patrick/Labels')
+        self.outDir = os.path.join(r'./Patrick/Labels', '%s' %(self.category))
         if not os.path.exists(self.outDir):
             os.mkdir(self.outDir)
         self.loadImage()
@@ -207,7 +210,7 @@ class LabelTool():
                     self.bboxIdList.append(tmpId)
                     self.listbox.insert(END, '(%d, %d) -> (%d, %d) -> (%s)' %(tmp[0], tmp[1], tmp[2], tmp[3], classes[int(yolo_data[0])]))
                     self.listbox.itemconfig(len(self.bboxIdList) - 1, fg = COLORS[int(yolo_data[0])])
-        
+
     def saveImage(self):
         with open(self.labelfilename, 'w') as f:
             for bbox,bboxcls in zip(self.bboxList,self.bboxListCls):
@@ -215,7 +218,7 @@ class LabelTool():
                 b = (float(xmin), float(xmax), float(ymin), float(ymax))
                 bb = self.convert((self.curimg_w,self.curimg_h), b)
                 f.write(str(bboxcls) + " " + " ".join([str(a) for a in bb]) + '\n')
-        print('Image No. %d saved' %(self.cur))
+        print('Image No. %d saved (%s)' %(self.cur,self.labelfilename))
 
 
     def mouseClick(self, event):

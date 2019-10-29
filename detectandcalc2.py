@@ -16,9 +16,13 @@ import time
 ERRORTHRESH = 8
 SLOMO = True
 #jerrycam1
-YU = 21
-YD = 439
-LEVERS = [306,504,704,801]
+#YU = 21
+#YD = 493
+#finalcam2 half
+YU = 0
+YD = 540
+#LEVERS = [306,504,704,801] #jerrycam3.mp4
+LEVERS = [294,552,813,951] #finalcam2.mp4 and resived
 
 prevx = np.array([])
 prevy = np.array([])
@@ -36,7 +40,7 @@ def checknewcolumn(px,py):
 #takes in a point (px,py) which is the latest coordinate of the ball.
 #uses linear regression and restarts calculating when ball crosses a lever (only time it can be deflected)
 #return list that contains the y coordinate of ball at each of the levers
-def calc2(px,py):
+def calc(px,py):
 	global prevx,prevy
 	#print(px,py)
 	#prev is empty
@@ -88,7 +92,7 @@ def calc2(px,py):
 #takes in a point (px,py) which is the latest coordinate of the ball.
 #uses linear regression and restarts when the regression reaches a certain error
 #return list that contains the y coordinate of ball at each of the levers
-def calc(px,py):
+def calc2(px,py):
 	global prevx,prevy
 	#print(px,py)
 	#prev is empty
@@ -126,12 +130,13 @@ def calc(px,py):
 	p = np.poly1d(z)
 	#print(str(z) + " " + str(len(prevx)))
 
-	for i in range(len(LEVERS)):
-		ret[i] = p(LEVERS[i])
-		if(ret[i] < YU):
-			ret[i] += 2*(YU-ret[i])
-		if(ret[i] > YD):
-			ret[i] -= 2*(ret[i]-YD)
+	if(len(prevx) >= 3):
+		for i in range(len(LEVERS)):
+			ret[i] = p(LEVERS[i])
+			if(ret[i] < YU):
+				ret[i] += 2*(YU-ret[i])
+			if(ret[i] > YD):
+				ret[i] -= 2*(ret[i]-YD)
 
 
 	#print("hi" + ret)
@@ -152,7 +157,7 @@ def run(vs):
 	# ball in the HSV color space, then initialize the
 	# list of tracked points
 	#greenLower = (29, 86, 6)
-	greenLower = (80, 100, 100)
+	greenLower = (100, 100, 100)
 	greenUpper = (150, 255, 255)
 	pts = deque(maxlen=args["buffer"])
 
