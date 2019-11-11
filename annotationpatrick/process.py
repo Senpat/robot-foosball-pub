@@ -5,7 +5,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 
 print(current_dir)
 
-current_dir = '/afs/csl.tjhsst.edu/students/2020/2020jli2/Documents/Yolo-Annotation-Tool-New--master/Images/foosball/'
+current_dir = 'C:/Users/zz198/Desktop/Senior Research/robot-foosball/annotationpatrick/Patrick/Images'
 
 # Directory where the data will reside, relative to 'darknet.exe'
 #path_data = './NFPAdataset/'
@@ -14,8 +14,8 @@ current_dir = '/afs/csl.tjhsst.edu/students/2020/2020jli2/Documents/Yolo-Annotat
 percentage_test = 10;
 
 # Create and/or truncate train.txt and test.txt
-file_train = open('train.txt', 'w')
-file_test = open('test.txt', 'w')
+file_train = open('ball-train.txt', 'w')
+file_test = open('ball-test.txt', 'w')
 
 # Populate train.txt and test.txt
 counter = 1
