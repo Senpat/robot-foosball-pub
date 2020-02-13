@@ -14,15 +14,17 @@ import imutils
 import time
 
 ERRORTHRESH = 8
-SLOMO = True
-#jerrycam1
-#YU = 21
-#YD = 493
+SLOMO = False
+VIDEO = True
+
+#jerrycam3
+YU = 21
+YD = 493
 #finalcam2 half
-YU = 0
-YD = 540
-#LEVERS = [306,504,704,801] #jerrycam3.mp4
-LEVERS = [294,552,813,951] #finalcam2.mp4 and resived
+#YU = 0
+#YD = 540
+LEVERS = [306,504,704,801] #jerrycam3.mp4
+#LEVERS = [294,552,813,951] #finalcam2.mp4 and resived
 
 prevx = np.array([])
 prevy = np.array([])
@@ -245,7 +247,8 @@ def run(vs):
 
 		# show the frame to our screen
 		cv2.imshow("Frame", frame)
-		#out.write(frame)
+		if(VIDEO):
+			out.write(frame)
 		#print(time.time()-start)
 		key = cv2.waitKey(1) & 0xFF
 
@@ -265,7 +268,7 @@ def run(vs):
 	# otherwise, release the camera
 	else:
 		vs.release()
-	#out.release()
+	out.release()
 	# close all windows
 	cv2.destroyAllWindows()
 
@@ -287,8 +290,8 @@ if __name__ == "__main__":
 	# otherwise, grab a reference to the video file
 	else:
 		vs = cv2.VideoCapture(args["video"])
-	#fourcc = cv2.VideoWriter_fourcc(*'XVID')									#commented out to not show
-	#out = cv2.VideoWriter("output.avi", fourcc, 120, (480,852))
+	fourcc = cv2.VideoWriter_fourcc(*'XVID')									#commented out to not show
+	out = cv2.VideoWriter("detectbasic2.avi", fourcc, 120, (852,480))
 	# allow the camera or video file to warm up
 	print("warming up...")
 	time.sleep(2.0)

@@ -24,7 +24,7 @@ while True:
 	# then we have reached the end of the video
 	if frame is None:
 		break
-	cv2.imwrite("C:/Users/zz198/Desktop/Senior Research/Videos/finalcam2frames/"+str(ct)+".jpg",frame)
+	cv2.imwrite("C:/Users/zz198/Desktop/Senior Research/Videos/finalcam4_3blueframes/"+str(ct)+".jpg",frame)
 	#print(time.time()-start)
 	if(ct%100 == 0):
 		print(ct)

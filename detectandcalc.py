@@ -13,6 +13,8 @@ import cv2
 import imutils
 import time
 
+SLOMO = False
+VIDEO = False
 
 #jerrycam1
 YU = 21
@@ -96,7 +98,7 @@ def calc(px,py):
 
 
 
-def run(vs):
+def run(vs,out):
 	print("running...")
 
 	# define the lower and upper boundaries of the "green"
@@ -192,7 +194,8 @@ def run(vs):
 
 		# show the frame to our screen
 		cv2.imshow("Frame", frame)
-		#out.write(frame)
+		if(VIDEO):
+			out.write(frame)
 		#print(time.time()-start)
 		key = cv2.waitKey(1) & 0xFF
 
@@ -201,7 +204,7 @@ def run(vs):
 			break
 
 		#"slomo"
-		if(len(cnts)>0):
+		if(SLOMO and len(cnts)>0):
 			time.sleep(0.1)
 
 
@@ -212,7 +215,9 @@ def run(vs):
 	# otherwise, release the camera
 	else:
 		vs.release()
-	#out.release()
+
+	if(VIDEO):
+		out.release()
 	# close all windows
 	cv2.destroyAllWindows()
 
@@ -234,10 +239,12 @@ if __name__ == "__main__":
 	# otherwise, grab a reference to the video file
 	else:
 		vs = cv2.VideoCapture(args["video"])
-	#fourcc = cv2.VideoWriter_fourcc(*'XVID')									#commented out to not show
-	#out = cv2.VideoWriter("output.avi", fourcc, 120, (480,852))
+	out = False
+	if(VIDEO):
+		fourcc = cv2.VideoWriter_fourcc(*'XVID')									#commented out to not show
+		out = cv2.VideoWriter("detectandcalcbasic.avi", fourcc, 120, (852,480))
 	# allow the camera or video file to warm up
 	print("warming up...")
 	time.sleep(2.0)
 
-	run(vs)
+	run(vs,out)
